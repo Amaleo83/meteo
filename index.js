@@ -1,10 +1,12 @@
-const express = require('express');
+import ollama from "ollama"
+
+import express from 'express';
+
 const ejs = require('ejs');
 const path = require('path');
 require('dotenv').config()
 const XMLHttpRequest = require('xhr2');
 
-const app = express();
 const port = 8080;
 
 const apiKey = process.env.API_KEY;
@@ -28,10 +30,10 @@ app.get('/meteo', (req, res) => {
 app.get('/meteo/:coords', (req, res) => {
     let latAndLong = req.params.coords.split(";")
     let weatherdata;
-                        
+
     let xhr = new XMLHttpRequest;
-    xhr.open('GET', 
-    'https://api.tomorrow.io/v4/weather/forecast?location='+latAndLong[0]+','+latAndLong[1]+'&apikey='+apiKey, 
+    xhr.open('GET',
+    'https://api.tomorrow.io/v4/weather/forecast?location='+latAndLong[0]+','+latAndLong[1]+'&apikey='+apiKey,
     true);
     xhr.onreadystatechange = () => {
         if (xhr.readyState === 4 && xhr.status === 200) {
@@ -48,9 +50,24 @@ app.get('/meteo/:coords', (req, res) => {
 
         res.render('meteo', {countrydata: JSON.stringify(countrydata), port: port, weatherdata: weatherdata})
     }
-    
-}) 
 
+})
+app.post('/api/chatbot', async (req, res) => {
+
+
+    const userMessage = req.body.message.toLowerCase();
+
+    const response = await ollama.chat({
+        model: 'gemma2:2b',
+        messages: [{ role: 'user', content: userMessage }],
+      })
+      console.log(response.message.content)
+
+      let botResponse = response.message.content;
+
+
+    res.json({ response: botResponse });
+});
 
 // Démarrer le serveur
 app.listen(port, () => {

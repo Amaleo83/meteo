@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/Amaleo83/meteo#readme",
   "description": "",
+  "type": "module",
   "dependencies": {
     "dotenv": "^16.4.5",
     "ejs": "^3.1.10",
