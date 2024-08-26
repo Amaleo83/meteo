@@ -1,5 +1,6 @@
-const express = require('express');
-const path = require('path');
+import ollama from "ollama"
+
+import express from 'express';
 const app = express();
 const port = 8080;
 
@@ -8,17 +9,20 @@ app.use(express.static('public'));
 
 // Route pour l'API de chatbot
 app.use(express.json());
-app.post('/api/chatbot', (req, res) => {
+app.post('/api/chatbot', async (req, res) => {
+
+    
     const userMessage = req.body.message.toLowerCase();
 
-    let botResponse = "Je n'ai pas compris !";
+    const response = await ollama.chat({
+        model: 'gemma2:2b',
+        messages: [{ role: 'user', content: userMessage }],
+      })
+      console.log(response.message.content)
 
-    if (userMessage.includes("salut") || userMessage.includes("bonjour")) {
-        botResponse = "Très bien et toi ?";
-    } else if (userMessage.includes("comment ça va") || userMessage.includes("ça va")) {
-        botResponse = "Je vais bien, merci !";
-    }
+      let botResponse = response.message.content;
 
+      
     res.json({ response: botResponse });
 });
 
