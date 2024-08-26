@@ -15,5 +15,8 @@
     "url": "https://github.com/Amaleo83/meteo/issues"
   },
   "homepage": "https://github.com/Amaleo83/meteo#readme",
-  "description": ""
+  "description": "",
+  "dependencies": {
+    "express": "^4.19.2"
+  }
 }
