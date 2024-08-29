@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>MétéoBot</title>
+</head>
+<body>
+    <input id="searchBar" type="search" name="search" placeholder="Type your location ...">
+    
+    <ul id="locationResults"></ul>
+    <div id="countrydata" style="display:none"><%- countrydata %></div>
+
+    <script>
+
+        let results = [];
+
+        function searchResultsLoad() {
+            let countrydata = JSON.parse(document.querySelector('#countrydata').innerText)
+            let searchQuery = document.querySelector('input[name="search"]').value
+            let resultsUlContainer = document.querySelector("#locationResults")
+
+            resultsUlContainer.innerHTML = ""
+    
+            if(searchQuery != "") {
+                for(item of countrydata) {
+                    if( item.country.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                        item.city.toLowerCase().includes(searchQuery.toLowerCase())) {
+                        let liElem = document.createElement("li")
+                        liElem.innerText = item.country + " - " + item.city
+                        liElem.className=item.lat+";"+item.lng
+                        resultsUlContainer.appendChild(liElem)
+                        results.push(item)
+                    }
+                    if(resultsUlContainer.children.length > 10)
+                        break;
+                }
+                
+                for(let item of resultsUlContainer.children) {
+                    item.addEventListener("click", (event) => {
+                        window.location.replace("http://localhost:<%- port %>/meteo/"+event.target.className);
+                    })
+                }
+            }
+        }
+        document.querySelector("#searchBar").addEventListener('input', (event) => {
+            searchResultsLoad();
+        })
+        
+        if('<%- weatherdata %>' != 'null') {
+            let weatherdata = JSON.parse('<%- weatherdata %>')
+            let weatherDataToday = [];
+            let weatherDataTomorrow = [];
+
+            weatherDataToday["cloudCoverAvg"] = weatherdata["timelines"]["daily"][1]["values"]["cloudCoverAvg"]
+            weatherDataToday["precipitationProbabilityAvg"] = weatherdata["timelines"]["daily"][1]["values"]["precipitationProbabilityAvg"]
+            weatherDataToday["rainAccumulationSum"] = weatherdata["timelines"]["daily"][1]["values"]["rainAccumulationSum"]
+            weatherDataToday["snowAccumulationSum"] = weatherdata["timelines"]["daily"][1]["values"]["snowAccumulationSum"]
+            weatherDataToday["temperatureAvg"] = weatherdata["timelines"]["daily"][1]["values"]["temperatureAvg"]
+
+            weatherDataTomorrow["cloudCoverAvg"] = weatherdata["timelines"]["daily"][[2]]["values"]["cloudCoverAvg"]
+            weatherDataTomorrow["precipitationProbabilityAvg"] = weatherdata["timelines"]["daily"][[2]]["values"]["precipitationProbabilityAvg"]
+            weatherDataTomorrow["rainAccumulationSum"] = weatherdata["timelines"]["daily"][[2]]["values"]["rainAccumulationSum"]
+            weatherDataTomorrow["snowAccumulationSum"] = weatherdata["timelines"]["daily"][[2]]["values"]["snowAccumulationSum"]
+            weatherDataTomorrow["temperatureAvg"] = weatherdata["timelines"]["daily"][[2]]["values"]["temperatureAvg"]
+
+            //todo intégration IA
+        }
+
+    </script>
+</body>
+</html>
